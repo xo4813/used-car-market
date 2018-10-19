@@ -49,10 +49,13 @@ contract InspectionRecord {
 
     //수리필요
     uint8 outside;
+    uint8 inside;
     uint8 wheel;
     uint8 tire;
     uint8 window;
 
+    uint date; //점검일
+    uint guarantee;  //보증기간
 
     struct contractingParites{
         address agentAddr;
@@ -122,6 +125,19 @@ contract InspectionRecord {
         fuelLeak=_fuelLeak;
     }
 
-    
+    function setNeedRepair(uint8 _outside, uint8 _inside, uint8 _wheel, uint8 _tire, uint8 _window){
+        outside=_outside;
+        inside=_inside;
+        wheel=_wheel;
+        tire=_tire;
+        window=_window;
+    }
 
+    function setDate(uint _date){
+        date=_date;
+    }
+
+    function setGuarantee(uint _guarantee){
+        guarantee=_guarantee;
+    }
 }

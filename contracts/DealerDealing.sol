@@ -4,7 +4,7 @@ contract DealerDealing{
 
 	contractingParites seller;
     contractingParites buyer;
-    
+
     contractingParites assessor;
 	//매매업자 정보
 	address agentAddr;
@@ -16,15 +16,8 @@ contract DealerDealing{
     string sTransactorName;
 
     //거래내역 정보
-    string date;
-    uint amount;
-    string depositDate;
-    uint deposit;
-    string middleDate;
-    uint middlePayment;
-    string balanceDate;
-    uint balance;
-    string deliveryDate;
+    contractInfo buyInfo;
+    contractInfo sellInfo;
 
     //차 내용
     uint VIN;
@@ -54,6 +47,18 @@ contract DealerDealing{
         string name;
         string phoneNum;
         string residenceAddress;
+    }
+
+    struct contractInfo{
+    	string date; //성사된 날짜
+	    uint amount; //금액
+	    string depositDate; //계약금 지불 일
+	    uint deposit; //계약금
+	    string middleDate; //중도금 지불 날짜
+	    uint middlePayment; //중도금
+	    string balanceDate; //잔액 지불 날짜
+	    uint balance; //잔액
+	    string deliveryDate;  //인도한 날짜
     }
    
     //거래 생성자는 판매자
@@ -181,9 +186,9 @@ contract DealerDealing{
 	  	그렇기 때문에 구매자는 계약금(보증금)을 걸어두어야 한다. 취소할땐 보증금을 못돌려 받는다.
 	  	딜러는 판매한다고 유인해놓고 차를 안팔거나 할 수 있다. 안팔때 보증금을 돌려 받지 못한다.
 	*/
-	function setDeposit(){
-		deposit=deposit+(msg.value/1000000000000000000);
-	}
+	// function setDeposit(){
+	// 	deposit=deposit+(msg.value/1000000000000000000);
+	// }
 
 
 }
