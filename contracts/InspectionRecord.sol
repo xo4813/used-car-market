@@ -1,12 +1,13 @@
-pragma solidity ^0.4.26;
+pragma solidity ^0.4.25;
 
 /**
  * Tht InspectionRecord
  contract does this and that...
  */
 contract InspectionRecord {
-    contractingParites inspector;
-    contractingParites notifyer;
+    contractingParites public inspector;
+    contractingParites public notifier;
+    contractingParites public assessor;
 
      //차 기본 내용
     uint modelNo;
@@ -54,8 +55,9 @@ contract InspectionRecord {
     uint8 tire;
     uint8 window;
 
-    uint date; //점검일
-    uint guarantee;  //보증기간
+    uint estimateValue;  // 가격 추산
+    uint public date; //점검일
+    uint public guarantee;  //보증기간
 
     struct contractingParites{
         address agentAddr;
@@ -67,22 +69,23 @@ contract InspectionRecord {
     }
 
     function InspectionRecord(uint _VIN, uint _modelNo, string _carName, string _productYear,
-        string _licenseNum, string _fuel) {
+        string _licenseNum, string _fuel, uint _transmission) {
         modelNo=_modelNo;
         carName=_carName;
         licenseNum=_licenseNum;
         productYear=_productYear;
         VIN=_VIN;
         fuel=_fuel;
+        transmission=_transmission;
     }
 
     function setInspector(address _agentAddr, string _agentNo, string _agentName,
-        string _name, string phoneNum){
+        string _name, string _phoneNum){
         inspector=contractingParites(_agentAddr, _agentNo, _agentName, msg.sender, _name, _phoneNum);
     }
 
     function setNotifier(address _agentAddr, string _agentNo, string _agentName,
-        string _name, string phoneNum){
+        string _name, string _phoneNum){
         notifier=contractingParites(_agentAddr, _agentNo, _agentName, msg.sender, _name, _phoneNum);
     }
 
@@ -105,7 +108,7 @@ contract InspectionRecord {
         color=_color;
     }
 
-    function setAccident(bool _isAccidentHistory, bool _simpleRepair){
+    function setHistory(bool _isAccidentHistory, bool _simpleRepair){
         isAccidentHistory=_isAccidentHistory;
         simpleRepair=_simpleRepair;
     }
@@ -133,11 +136,41 @@ contract InspectionRecord {
         window=_window;
     }
 
+    function setEstimateValue(uint _estimateValue, address _agentAddr, string _agentNo, string _agentName,
+        string _name, string _phoneNum){
+        estimateValue=_estimateValue;
+        assessor=contractingParites(_agentAddr,_agentNo,_agentName,msg.sender,_name,_phoneNum);
+    }
+
     function setDate(uint _date){
         date=_date;
     }
 
     function setGuarantee(uint _guarantee){
         guarantee=_guarantee;
+    }
+
+    function getInfo() view returns (uint, string, string, string, uint, uint, string){
+        return (modelNo, carName, licenseNum, productYear, VIN, transmission, fuel);
+    }
+    function getParites() view returns (uint8, uint,  bool, uint8, string){
+        return (dashboardStatus, mileage, tuning, specialRecord, color);
+    }
+
+    function getOverall() view returns (uint8, uint,  bool, uint8, string){
+        return (dashboardStatus, mileage, tuning, specialRecord, color);
+    }
+
+    function getHistory() view returns (bool, bool){
+        return(isAccidentHistory, simpleRepair);
+    }
+
+    function getDetail() view returns (uint8, uint8, uint8, uint8, uint8, uint8, uint8, uint8, uint8, uint8){
+        return(enginStatus, transmissionStatus, oilLeak, coolantLeak, clutch,
+            stearing, breakStatus, wiper, airConditioner, fuelLeak);
+    }
+
+    function getNeedRepair() view returns (uint8, uint8, uint8, uint8, uint8){
+        return(outside, inside, wheel, tire, window);
     }
 }

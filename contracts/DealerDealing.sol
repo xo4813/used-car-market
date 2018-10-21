@@ -1,11 +1,10 @@
-pragma solidity ^0.4.26;
+pragma solidity ^0.4.25;
 
 contract DealerDealing{
 
 	contractingParites seller;
     contractingParites buyer;
 
-    contractingParites assessor;
 	//매매업자 정보
 	address agentAddr;
 	string agentBoss;
@@ -29,9 +28,8 @@ contract DealerDealing{
 
 	//중고차 성능점검
 	address inspectionRecord;
-	uint inspectionCost;
-	uint estimateValue;
-	uint repairCost;
+	// uint inspectionCost;
+	// uint repairCost;
 
 	bool buying;
 	bool sellerApprove;
@@ -62,10 +60,9 @@ contract DealerDealing{
     }
    
     //거래 생성자는 판매자
-	function DealerDealing(address _transactorAddr, string _transactorName, uint _VIN, uint _modelNo, string _carName,
+	function DealerDealing(string _name, string _phoneNum, string _residenceAddress, uint _VIN, uint _modelNo, string _carName,
 		string _productYear, string _licenseNum, string _fuel){
-		transactorAddr=_transactorAddr;
-		transactorName=_transactorName;
+		seller=contractingParites(msg.sender, _name, _phoneNum, _residenceAddress);
 		VIN=_VIN;
 		modelNo=_modelNo;
 		carName=_carName;
@@ -84,9 +81,9 @@ contract DealerDealing{
 
 
 	// 판매자 정보 설정.
-	function setSeller(string _name, string _phoneNum, string _residenceAddress){
-		seller=contractingParites(msg.sender, _name, _phoneNum, _residenceAddress);
-	}
+	// function setSeller(string _name, string _phoneNum, string _residenceAddress){
+	// 	seller=contractingParites(msg.sender, _name, _phoneNum, _residenceAddress);
+	// }
 
 	//구매한 딜러 정보 설정
 	function setBDealer(string _name){
@@ -99,12 +96,33 @@ contract DealerDealing{
 		sTransactorAddr=msg.sender;
 		sTransactorName=_name;
 	}
+
 	// 구매자 정보 설정.
 	function setBuyer(string _name, string _phoneNum, string _residenceAddress){
 		buyer=contractingParites(msg.sender, _name, _phoneNum, _residenceAddress);
 	}
 
 
+	function setBuyInfo(string _date,uint _amount, string _deliveryDate){	
+		buyInfo=contractInfo(_date, _amount,"0",0,"0",0,_date,_amount, _deliveryDate);
+	}
+
+	function setSellInfo(string _date,uint _amount){	
+		sellInfo=contractInfo(_date, _amount,"0",0,"0",0,"0",0,"0");
+	}
+
+	function setDeposit(string _depositDate,uint _deposit){
+		sellInfo.depositDate=_depositDate;
+		sellInfo.deposit=_deposit;
+	}
+
+	function setBalance(string _balanceDate,uint _balance){
+		sellInfo.balanceDate=_balanceDate;
+		sellInfo.balance=_balance;
+	}
+	function setDeliveryDate(string _deliveryDate){
+		sellInfo.deliveryDate=_deliveryDate;
+	}
 
 	//거래 동의 함수.
 	function setSellerApprove(bool _decide){
@@ -160,8 +178,9 @@ contract DealerDealing{
 		}
 	}
 
-	function setInspectionRecord(){
-
+	//성능점검기록부 저장.
+	function setInspectionRecord(address inspect){
+		inspectionRecord=inspect;
 	}
 
 	//성능 점검 기록부 받을 때 차의 추정값 산정.
