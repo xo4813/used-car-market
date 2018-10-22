@@ -1,11 +1,10 @@
-pragma solidity ^0.4.26;
+pragma solidity ^0.4.25;
 
 contract DealerDealing{
 
 	contractingParites seller;
     contractingParites buyer;
-    
-    contractingParites assessor;
+
 	//매매업자 정보
 	address agentAddr;
 	string agentBoss;
@@ -16,15 +15,8 @@ contract DealerDealing{
     string sTransactorName;
 
     //거래내역 정보
-    string date;
-    uint amount;
-    string depositDate;
-    uint deposit;
-    string middleDate;
-    uint middlePayment;
-    string balanceDate;
-    uint balance;
-    string deliveryDate;
+    contractInfo buyInfo;
+    contractInfo sellInfo;
 
     //차 내용
     uint VIN;
@@ -36,9 +28,8 @@ contract DealerDealing{
 
 	//중고차 성능점검
 	address inspectionRecord;
-	uint inspectionCost;
-	uint estimateValue;
-	uint repairCost;
+	// uint inspectionCost;
+	// uint repairCost;
 
 	bool buying;
 	bool sellerApprove;
@@ -55,12 +46,23 @@ contract DealerDealing{
         string phoneNum;
         string residenceAddress;
     }
+
+    struct contractInfo{
+    	string date; //성사된 날짜
+	    uint amount; //금액
+	    string depositDate; //계약금 지불 일
+	    uint deposit; //계약금
+	    string middleDate; //중도금 지불 날짜
+	    uint middlePayment; //중도금
+	    string balanceDate; //잔액 지불 날짜
+	    uint balance; //잔액
+	    string deliveryDate;  //인도한 날짜
+    }
    
     //거래 생성자는 판매자
-	function DealerDealing(address _transactorAddr, string _transactorName, uint _VIN, uint _modelNo, string _carName,
+	function DealerDealing(string _name, string _phoneNum, string _residenceAddress, uint _VIN, uint _modelNo, string _carName,
 		string _productYear, string _licenseNum, string _fuel){
-		transactorAddr=_transactorAddr;
-		transactorName=_transactorName;
+		seller=contractingParites(msg.sender, _name, _phoneNum, _residenceAddress);
 		VIN=_VIN;
 		modelNo=_modelNo;
 		carName=_carName;
@@ -79,9 +81,9 @@ contract DealerDealing{
 
 
 	// 판매자 정보 설정.
-	function setSeller(string _name, string _phoneNum, string _residenceAddress){
-		seller=contractingParites(msg.sender, _name, _phoneNum, _residenceAddress);
-	}
+	// function setSeller(string _name, string _phoneNum, string _residenceAddress){
+	// 	seller=contractingParites(msg.sender, _name, _phoneNum, _residenceAddress);
+	// }
 
 	//구매한 딜러 정보 설정
 	function setBDealer(string _name){
@@ -94,12 +96,33 @@ contract DealerDealing{
 		sTransactorAddr=msg.sender;
 		sTransactorName=_name;
 	}
+
 	// 구매자 정보 설정.
 	function setBuyer(string _name, string _phoneNum, string _residenceAddress){
 		buyer=contractingParites(msg.sender, _name, _phoneNum, _residenceAddress);
 	}
 
 
+	function setBuyInfo(string _date,uint _amount, string _deliveryDate){	
+		buyInfo=contractInfo(_date, _amount,"0",0,"0",0,_date,_amount, _deliveryDate);
+	}
+
+	function setSellInfo(string _date,uint _amount){	
+		sellInfo=contractInfo(_date, _amount,"0",0,"0",0,"0",0,"0");
+	}
+
+	function setDeposit(string _depositDate,uint _deposit){
+		sellInfo.depositDate=_depositDate;
+		sellInfo.deposit=_deposit;
+	}
+
+	function setBalance(string _balanceDate,uint _balance){
+		sellInfo.balanceDate=_balanceDate;
+		sellInfo.balance=_balance;
+	}
+	function setDeliveryDate(string _deliveryDate){
+		sellInfo.deliveryDate=_deliveryDate;
+	}
 
 	//거래 동의 함수.
 	function setSellerApprove(bool _decide){
@@ -155,8 +178,9 @@ contract DealerDealing{
 		}
 	}
 
-	function setInspectionRecord(){
-
+	//성능점검기록부 저장.
+	function setInspectionRecord(address inspect){
+		inspectionRecord=inspect;
 	}
 
 	//성능 점검 기록부 받을 때 차의 추정값 산정.
@@ -181,9 +205,9 @@ contract DealerDealing{
 	  	그렇기 때문에 구매자는 계약금(보증금)을 걸어두어야 한다. 취소할땐 보증금을 못돌려 받는다.
 	  	딜러는 판매한다고 유인해놓고 차를 안팔거나 할 수 있다. 안팔때 보증금을 돌려 받지 못한다.
 	*/
-	function setDeposit(){
-		deposit=deposit+(msg.value/1000000000000000000);
-	}
+	// function setDeposit(){
+	// 	deposit=deposit+(msg.value/1000000000000000000);
+	// }
 
 
 }
