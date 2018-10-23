@@ -2,12 +2,21 @@ pragma solidity ^0.4.26;
 
 contract UsedCar{
 	address public owner;
+	string public agentBoss;
+	string public agentNo;
 
-	uint requestPurchasesIndex;
-	uint sellIndex;
-	address[] requestPurchases;
-	address[] underInspections;
-	address[] selling;
+	uint usedCarNum;
+	uint completionNum;
+	address[] usedCars;
+	address[] completion;
+	mapping(address => car) usedCarsInfo;
+	mapping(address => car) completionInfo;
+
+	//기업 설정
+	struct car{
+		bool isReg;
+		uint index;
+	}
 
 	modifier onlyOwner(){
 		require(msg.sender==owner);
@@ -16,30 +25,31 @@ contract UsedCar{
 
 	function UsedCar(){
 		owner=msg.sender;
+		agentBoss="Seok Hyeon Yoon";
+		agentNo="123456-01-123456";
+		usedCarNum=0;
+		completionSum=0;
 	}
 
 	function setOwner() onlyOwner{
 		owner=msg.sender;
 	}
 
-	function requestPurchase(uint _VIN, uint _modelNo, string _carName, string _productYear, string _licenseNum ,
-		string _fuel){
-		DealearDealing d=new DealearDealing(_VIN, _modelNo, _carName, _productYear, _licenseNum, _fuel);
-		requestPurchases.push(d);
+	function setAgent(string _boss, string _no) onlyOwner{
+		agentBoss=_boss;
+		agentNo=_no;
 	}
 
-	function successPurchase(){
-		if(msg.sender!=owner) return;
-
-
+	function addDealing(){
+		DealearDealing d=new DealearDealing(owner, agentBoss, agentNo);
+		usedCars.push(address(d));
+		usedCarsInfo[address(d)].isReg=true;
+		usedCarsInfo[address(d)].index=usedCarNum;
+		usedCarNum+=1;
 	}
 
-	function startSell(uint _index){
-		waiting[sellIndex]=buying[_index]; 
-		delete waiting[_index];
-		sellIndex=sellIndex+1;
+	function successSell(){
+		completionNum
 	}
-
-	function request
-
+	
 }

@@ -8,6 +8,10 @@ contract InspectionRecord {
     contractingParites public inspector;
     contractingParites public notifier;
     contractingParites public assessor;
+    bytes public inspectorSign;
+    bytes public notifierSign;
+    bytes public assessorSign;
+
 
      //차 기본 내용
     uint modelNo;
@@ -17,6 +21,7 @@ contract InspectionRecord {
     uint VIN;
     uint transmission;
     string fuel;
+    bytes basicSign;
 
     //종합 상태
     uint8 dashboardStatus; 
@@ -26,6 +31,7 @@ contract InspectionRecord {
     uint8 specialRecord; // 0: 없다, 1:침수, 2:화재
     uint8 usageChange; // 0: 없다, 1:렌트, 2:리스, 3:영업
     string color;
+    bytes overAllSign;
 
     //사고 교환 수리 이력
     uint8[] status; //0: 없음, 1:교환, 2:판큼,용접, 3:흡집, 4:요철, 5:부식, 6:손상
@@ -34,7 +40,7 @@ contract InspectionRecord {
     bool[] outsideA;
     bool[] outsideB;
     bool[] frame;
-
+    bytes historySign;
 
     //세부상태
     uint8 enginStatus;
@@ -47,6 +53,7 @@ contract InspectionRecord {
     uint8 wiper;
     uint8 airConditioner;
     uint8 fuelLeak;
+    bytes detailSign;
 
     //수리필요
     uint8 outside;
@@ -54,8 +61,10 @@ contract InspectionRecord {
     uint8 wheel;
     uint8 tire;
     uint8 window;
+    bytes needRepairSign;
 
     uint estimateValue;  // 가격 추산
+    bytes estimateValueSign;
     uint public date; //점검일
     uint public guarantee;  //보증기간
 
@@ -77,6 +86,7 @@ contract InspectionRecord {
         VIN=_VIN;
         fuel=_fuel;
         transmission=_transmission;
+        basicSign=sha256(modelNo, carName, licenseNum, productYear, VIN, fuel, transmission);
     }
 
     function setInspector(address _agentAddr, string _agentNo, string _agentName,
@@ -89,15 +99,26 @@ contract InspectionRecord {
         notifier=contractingParites(_agentAddr, _agentNo, _agentName, msg.sender, _name, _phoneNum);
     }
 
-    function signInspector(){
-        if(msg.sender!=inspector.addr) return;
+    function setAssessor(address _agentAddr, string _agentNo, string _agentName,
+        string _name, string _phoneNum){
+        assessor=contractingParites(_agentAddr, _agentNo, _agentName, msg.sender, _name, _phoneNum);
+    }
 
+    function signInspector(){
+        require(msg.sender==inspector.addr);
+        inspectorSign=sha256(basicSign, overAllSign, historySign, detailSign, needRepairSign);
     }
 
     function signNotifier(){
-        if(msg.sender!=notifier.addr) return;
-
+        require(msg.sender==notifier.addr);
+        notifierSign=sha256(basicSign, overAllSign, historySign, detailSign, needRepairSign);
     }
+
+    function signAssessor(){
+        require(msg.sender==assessor.addr);
+        assessorSign=sha256(estimateValueSign);
+    }
+
 
     function setOverall( uint8 _dashboardStatus, uint _mileage,  bool _tuning, 
         uint8 _specialRecord, string _color){
@@ -106,11 +127,13 @@ contract InspectionRecord {
         tuning=_tuning;
         specialRecord=_specialRecord;
         color=_color;
+        overAllSign=sha256(dashboardStatus, mileage, tuning, specialRecord, color);
     }
 
     function setHistory(bool _isAccidentHistory, bool _simpleRepair){
         isAccidentHistory=_isAccidentHistory;
         simpleRepair=_simpleRepair;
+        historySign=sha256(isAccidentHistory, simpleRepair);
     }
 
     function setDetail(uint8 _enginStatus, uint8 _transmissionStatus, uint8 _oilLeak, uint8 _coolantLeak,
@@ -126,6 +149,8 @@ contract InspectionRecord {
         wiper=_wiper;
         airConditioner=_airConditioner;
         fuelLeak=_fuelLeak;
+        detailSign=sha256(enginStatus, transmissionStatus, oilLeak, coolantLeak, clutch, stearing 
+            breakStatus, wiper, airConditioner, fuelLeak);
     }
 
     function setNeedRepair(uint8 _outside, uint8 _inside, uint8 _wheel, uint8 _tire, uint8 _window){
@@ -134,12 +159,12 @@ contract InspectionRecord {
         wheel=_wheel;
         tire=_tire;
         window=_window;
+        needRepairSign=sha256(outside, inside, wheel, tire, window);
     }
 
-    function setEstimateValue(uint _estimateValue, address _agentAddr, string _agentNo, string _agentName,
-        string _name, string _phoneNum){
+    function setEstimateValue(uint _estimateValue){
         estimateValue=_estimateValue;
-        assessor=contractingParites(_agentAddr,_agentNo,_agentName,msg.sender,_name,_phoneNum);
+        estimateValueSign=sha256(estimateValue);
     }
 
     function setDate(uint _date){
