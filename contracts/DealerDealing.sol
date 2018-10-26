@@ -1,5 +1,7 @@
 pragma solidity ^0.4.25;
 
+import "./inspectionRecord.sol";
+
 contract DealerDealing{
 
 	contractingParites seller;

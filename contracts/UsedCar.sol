@@ -1,4 +1,5 @@
 pragma solidity ^0.4.26;
+import "./DealearDealing.sol";
 
 contract UsedCar{
 	address public owner;
